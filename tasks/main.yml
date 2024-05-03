@@ -45,6 +45,14 @@
   set_fact:
     cplusplus_devtoolset: "gcc-toolset-{{ DTSVER }}"
 
+- name: Use new dts name on alma linux
+  when:
+    - ansible_os_family == 'RedHat'
+    - ansible_distribution == 'AlmaLinux'
+    - ansible_distribution_major_version|int >= 8
+  set_fact:
+    cplusplus_dts_rpms: "gcc-toolset-{{ DTSVER }}"
+
 - name: Install development tools
   when: ansible_os_family == 'RedHat' and development_groupinstall
   package:
@@ -192,7 +200,9 @@
     - (collections_enabled|bool
       and ansible_distribution_major_version|int < 8) or
       (DTSVER|int >= 9
-      and ansible_distribution_major_version|int == 8)
+      and ansible_distribution_major_version|int == 8) or
+      (DTSVER|int >= 9 
+      and ansible_distribution == 'AlmaLinux')
   tags:
     - base_gcc
 
@@ -226,7 +236,9 @@
     - (collections_enabled|bool
       and ansible_distribution_major_version|int < 8) or
       (DTSVER|int >= 9
-      and ansible_distribution_major_version|int == 8)
+      and ansible_distribution_major_version|int == 8) or
+      (DTSVER|int >= 9 
+      and ansible_distribution == 'AlmaLinux')
   tags:
     - base_gcc
     - notest
@@ -248,7 +260,9 @@
     - (collections_enabled|bool
       and ansible_distribution_major_version|int < 8) or
       (DTSVER|int >= 9
-      and ansible_distribution_major_version|int == 8)
+      and ansible_distribution_major_version|int >= 8) or
+      (DTSVER|int >= 9 
+      and ansible_distribution == 'AlmaLinux')
   set_fact:
     cmd_env: "source /opt/rh/{{ cplusplus_devtoolset }}/enable && "
   tags:
